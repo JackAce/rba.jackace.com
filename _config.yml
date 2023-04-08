@@ -26,7 +26,7 @@ baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://roulette-sim.jackace.com"
 twitter_username: jackace
 github_username:  jackace
-#google_analytics: G-ZTR881VYRZ
-google_adsense: ca-pub-6195512053653719
+google_analytics: G-D6BLYMY10E
+google_adsense: ca-pub-5831288475713424
 
 port: 4037
