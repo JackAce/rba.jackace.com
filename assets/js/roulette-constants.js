@@ -269,7 +269,7 @@ const HOTSPOTS_00_ONLY = [
     'x2-00-2',
     'x2-00-3',
     'x3-00-3',      // 00-2-3
-    'x3-basket',    // 0-00-2
+    'x3-basket',    // 0-00-2 - Can't call this 'x3-0-2' becuase that's already
     'x5-topline'    // 0-00-1-2-3
 ];
 
@@ -293,7 +293,7 @@ const HOTSPOT_INSIDE_ABSOLUTE_TOP = 87;
 const HOTSPOT_OUTSIDE_ABSOLUTE_LEFT = 100;
 const HOTSPOT_OUTSIDE_ABSOLUTE_TOP = 298;
 const EQUITY_ABSOLUTE_LEFT = 100;
-const EQUITY_ABSOLUTE_TOP = 615;
+const EQUITY_ABSOLUTE_TOP = 815;
 const WINLOSS_ABSOLUTE_LEFT = 100;
 const WINLOSS_ABSOLUTE_TOP = 465;
 const HIGHLIGHT_ABSOLUTE_LEFT = 100;

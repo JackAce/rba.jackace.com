@@ -6,7 +6,10 @@ body {
 
 #rouletteLayoutDiv {
     position: absolute;
-    z-index: 10;
+    xbackground-color: #f00;
+    z-index: 0;
+    width: 960px;
+    height: 750px;
 }
 #totalsTitleDiv {
     top: 0px;
@@ -20,8 +23,14 @@ body {
     width: 800px;
     height: 30px;
 }
-#equityTitleDiv {
+#chartTitleDiv {
     top: 575px;
+    left: 0px;
+    width: 800px;
+    height: 30px;
+}
+#equityTitleDiv {
+    top: 775px;
     left: 0px;
     width: 800px;
     height: 30px;
@@ -29,11 +38,10 @@ body {
 #configurationDiv {
     position: absolute;
     z-index: 11;
-    top: 800px;
-    left: 50px;
+    top: 930px;
+    left: 15px;
     width: 500px;
     height: 100px;
-    display: none;
 }
 #betInfoDiv {
     position: absolute;
@@ -127,6 +135,18 @@ body {
     top: 335px;
     left: 730px;
 }
+#chartButton {
+    position: absolute;
+    z-index: 30;
+    top: 465px;
+    left: 730px;
+}
+#bracesButton {
+    position: absolute;
+    z-index: 30;
+    top: 865px;
+    left: 730px;
+}
 #jackaceLabelDiv {
     position: absolute;
     z-index: 999;
@@ -141,7 +161,16 @@ body {
     left: 735px;
     top: 370px;
 }
+#chartContainer {
+    position: absolute;
+    top: 605px;
+    left: 10px;
+    height: 150px;
+}
 
+.configuration-hidden {
+    display: none;
+}
 .bet-info-hidden {
     display: none;
 }
@@ -358,12 +387,18 @@ body {
     display: none;
 }
 .win {
-    background-image: url('/assets/img/bg-white-52x30.png');
+    background-image: url('/assets/img/bg-black-52x30.png');
     position: absolute;
     width: 52px;
     height: 30px;
     border: 1px #fff solid;
     overflow: hidden;
+}
+.win .amt-pos {
+    color: #9f9;
+}
+.win .amt-neg {
+    color: #f99;
 }
 .win-0 {
     height: 90px;

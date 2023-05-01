@@ -6,6 +6,7 @@ title: Roulette Simulator - JackAce.com
         <title>{{-site.title-}}</title>
         <link rel="stylesheet" href="/assets/css/main.css" />
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js"></script>
         <script src="/assets/js/roulette-constants.js"></script>
         <script src="/assets/js/roulette-sim.js"></script>
         {%- if jekyll.environment == 'production' and site.google_analytics -%}
@@ -40,6 +41,8 @@ title: Roulette Simulator - JackAce.com
           <div id="undoButton" class="button"><img src="/assets/img/buttons/btn-backspace-40x40.png" width="30" height="30" onclick="undoLastBet();" /></div>
           <div id="doubleButton" class="button"><img src="/assets/img/buttons/btn-double-40x40.png" width="30" height="30" onclick="martingaleBet();" /></div>
           <div id="halveButton" class="button"><img src="/assets/img/buttons/btn-halve-40x40.png" width="30" height="30" onclick="halveBet();" /></div>
+          <!-- <div id="chartButton" class="button"><img src="/assets/img/buttons/btn-chart-34x40.png" width="34" height="40" onclick="toggleTextArea();" /></div> -->
+          <div id="bracesButton" class="button"><img src="/assets/img/buttons/btn-braces-40x40.png" width="30" height="30" onclick="toggleTextArea();" /></div>
 
           <img src="/assets/img/roulette/00_g-47x30.png" width="47" height="30" id="wheelToggleImage" onclick="toggleWheelType();" />
 
@@ -59,6 +62,9 @@ title: Roulette Simulator - JackAce.com
 
           <div id="totalsTitleDiv" class="title-bar" >&nbsp;</div>
           <div id="winLossTitleDiv" class="title-bar" >Win/Loss per Spot</div>
+          <div id="chartTitleDiv" class="title-bar" >Outcome Graph</div>
+          <div id="chartContainer" style="width: 750px;min-width: 750px;max-width: 750px;height: 150px;max-height: 150px;min-height: 150px;background-color: #222;">
+          </div>
           <div id="equityTitleDiv" class="title-bar" >Equity per Spot</div>
           <div id="cap-0-0" class="highlight-0-0-cap highlight-hidden" ></div>
           <div id="cap-00-0" class="highlight-00-0-cap highlight-hidden" ></div>
@@ -74,7 +80,7 @@ title: Roulette Simulator - JackAce.com
           <div id="betInfoBetWinningPayDiv"></div>
         </div>
 
-        <div id="configurationDiv">
+        <div id="configurationDiv" class="configuration-hidden">
           <textarea id="wager-config-textarea" ></textarea>
         </div>
 

@@ -15,6 +15,15 @@ function toggleWheelType() {
     }
 }
 
+function toggleTextArea() {
+    if ($('#configurationDiv').hasClass('configuration-hidden')) {
+        $('#configurationDiv').removeClass('configuration-hidden');
+    }
+    else {
+        $('#configurationDiv').addClass('configuration-hidden');
+    }
+}
+
 function addHotSpot(identifier, isGreen, left, top, className) {
     let newDiv = document.createElement('div');
 
@@ -230,7 +239,23 @@ function updateTotalAmounts() {
     
     if (totalBetAmount > 0) {
         $('#totalBetAmountDiv').text(totalBetAmount.toLocaleString());
-        $('#evDiv').text((-totalBetAmount / 37.0).toLocaleString());
+        if (currentWheelType === WHEEL_TYPE_0) {
+            // Single Zero wheel - 2.7%
+            $('#evDiv').text((-totalBetAmount / 37.0).toLocaleString());
+        }
+        else {
+            // Double Zero wheel - 5.26%
+            // TODO Check for topline bet
+            if (wagers['x5-topline'] > 0) {
+                let topLineBet = wagers['x5-topline'];
+                let totalBetWithoutTopLine = totalBetAmount - topLineBet;
+                let totalEv = -(totalBetWithoutTopLine / 19.0) - (topLineBet * 0.0789);
+                $('#evDiv').text(totalEv.toLocaleString());
+            }
+            else {
+                $('#evDiv').text((-totalBetAmount / 19.0).toLocaleString());
+            }
+        }
         $('#compsDiv').text((totalBetAmount / 185.0 ).toLocaleString());
     }
     else {
@@ -291,7 +316,7 @@ function setWheelType(wheelType) {
             $('#' + identifier).addClass('hotspot-hidden');
         });
         HOTSPOTS_0_00_OVERLAP.forEach(identifier => {
-            if (identifier !== 'x2-0-2' && identifier !== 'x2-0-1') {
+            if (identifier !== 'x2-0-1') {
                 $('#' + identifier).addClass('hotspot-topline');
                 $('#' + identifier).removeClass('hotspot-inside');
             }
@@ -321,15 +346,21 @@ function updateEquityPerSpot() {
         betInfo = getBetInfo(spot);
         currentWager = wagers[spot];
         currentNumbersCovered = betInfo.numbersCovered.length;
-        //console.log('currentWager for [' + currentWager + ']');
 
         for (let i = 0; i < currentNumbersCovered; i++) {
             currentNumber = betInfo.numbersCovered[i];
             if (!equityPerSpot[currentNumber]) {
-                //console.log('equityPerSpot for [' + currentNumber + ']');
                 equityPerSpot[currentNumber] = 0.00;
             }
-            equityPerSpot[currentNumber] += currentWager / currentNumbersCovered;
+
+            if (currentNumbersCovered === 5) {
+                // TODO: Handle the x5 top line bet
+                equityPerSpot[currentNumber] += currentWager / currentNumbersCovered;
+            }
+            else {
+                equityPerSpot[currentNumber] += currentWager / currentNumbersCovered;
+            }
+
         }
 
         $('#chip-' + spot + ' div').text(wagers[spot]);
@@ -374,6 +405,8 @@ function updateEquityPerSpot() {
             $('#win-' + spot + ' div').text(winLossAmount.toLocaleString());
         }
     });
+
+    updateChart();
 }
 
 function clearBetInfoUI() {
@@ -841,6 +874,107 @@ function createUiElements() {
     createEquityPerSpotDivs();
     createWinLossSpotDivs();
     createSpotHighlightDivs();
+}
+
+function compareFn(a, b) {
+    if (a < b) {
+      return -1;
+    }
+    if (a > b) {
+      return 1;
+    }
+    // a must be equal to b
+    return 0;
+}
+
+function updateChart() {
+    let outcomeGraph = document.getElementById("outcomeGraph");
+    if (outcomeGraph) {
+        outcomeGraph.remove();
+    }
+    let canvas = document.createElement('canvas');
+    canvas.setAttribute('id', 'outcomeGraph');
+    canvas.setAttribute('width', '750');
+    canvas.setAttribute('min-width', '750');
+    canvas.setAttribute('max-width', '750');
+    canvas.setAttribute('height', '150');
+    canvas.setAttribute('min-height', '150');
+    canvas.setAttribute('max-height', '150');
+    document.querySelector('#chartContainer').appendChild(canvas);
+
+    let lossesAndWins = [];
+
+    for (let i = 0; i < 38; i++) {
+        if (currentWheelType === WHEEL_TYPE_0 && i === 1) {
+            continue;
+        }
+        let value = $('#win-' + ROULETTE_NUMBERS[i]).text();
+        value = value.replace(',', '');
+        if (value) {
+            lossesAndWins.push(parseInt(value));
+        } else {
+            lossesAndWins.push(0);
+        }
+    }
+
+    lossesAndWins.sort(compareFn);
+
+    let labels = [];
+    let graphData = [];
+    let backgroundColors = [];
+    let counter = 0;
+    let worstLoss = 0;
+    if (lossesAndWins.length > 0) {
+        worstLoss = lossesAndWins[0];
+    }
+    for (let i = 0; i < lossesAndWins.length; i++) {
+        counter += lossesAndWins[i];
+        labels.push(i+1);
+        graphData.push(lossesAndWins[i]);
+
+        if (lossesAndWins[i] === worstLoss) {
+            // Red bar
+            backgroundColors.push('rgba(255, 0, 0, 1)');
+        }
+        else if (lossesAndWins[i] < 0) {
+            // Yellow bar
+            backgroundColors.push('rgba(255, 255, 0, 1)');
+        }
+        else {
+            // Green bar
+            backgroundColors.push('rgba(0, 255, 0, 1)');
+        }
+    }
+
+    const ctx = $('#outcomeGraph');
+    const myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Outcome',
+                    data: graphData,
+                    backgroundColor: backgroundColors
+                }
+            ]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    border: {
+                        color: 'rgba(255, 255, 255, 1)'
+                    }
+                }
+            }
+        }
+    });
 }
 
 $(document).ready(function() {
