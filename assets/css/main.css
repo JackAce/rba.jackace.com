@@ -3,10 +3,16 @@ body {
     color: #fff;
     background-color: #5c317c;
 }
+a {
+    color: #fff;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
 
 #rouletteLayoutDiv {
     position: absolute;
-    xbackground-color: #f00;
     z-index: 0;
     width: 960px;
     height: 750px;
