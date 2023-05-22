@@ -109,6 +109,14 @@ a:hover {
     left: 545px;
     top: 28px;
 }
+#linkDiv {
+    position: absolute;
+    left: 15px;
+    top: 940px;
+    z-index: 300;
+    color: #fff;
+    font-size: 12px;
+}
 
 #wager-config-textarea {
     position: absolute;
