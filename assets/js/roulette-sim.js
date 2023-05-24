@@ -870,10 +870,16 @@ function createSpotHighlightDivs() {
 }
 
 function createUiElements() {
+    setGraphDimensions();
     createHotspots();
     createEquityPerSpotDivs();
     createWinLossSpotDivs();
     createSpotHighlightDivs();
+}
+
+function setGraphDimensions() {
+    $('#chartContainer').width(GRAPH_WIDTH);
+    $('#chartContainer').height(GRAPH_HEIGHT);
 }
 
 function compareFn(a, b) {
@@ -894,12 +900,12 @@ function updateChart() {
     }
     let canvas = document.createElement('canvas');
     canvas.setAttribute('id', 'outcomeGraph');
-    canvas.setAttribute('width', '750');
-    canvas.setAttribute('min-width', '750');
-    canvas.setAttribute('max-width', '750');
-    canvas.setAttribute('height', '150');
-    canvas.setAttribute('min-height', '150');
-    canvas.setAttribute('max-height', '150');
+    canvas.setAttribute('width', GRAPH_WIDTH);
+    canvas.setAttribute('min-width', GRAPH_WIDTH);
+    canvas.setAttribute('max-width', GRAPH_WIDTH);
+    canvas.setAttribute('height', GRAPH_HEIGHT);
+    canvas.setAttribute('min-height', GRAPH_HEIGHT);
+    canvas.setAttribute('max-height', GRAPH_HEIGHT);
     document.querySelector('#chartContainer').appendChild(canvas);
 
     let lossesAndWins = [];

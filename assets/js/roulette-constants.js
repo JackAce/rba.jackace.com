@@ -316,3 +316,6 @@ const WHEEL_TYPE_0_LAYOUT_IMG_SRC = '/assets/img/roulette/roulette-layout-800x45
 const WHEEL_TYPE_00_LAYOUT_IMG_SRC = '/assets/img/roulette/roulette-layout-00-800x450.png';
 const WHEEL_TYPE_0_BUTTON_IMG_SRC = '/assets/img/roulette/0_g-47x30.png';
 const WHEEL_TYPE_00_BUTTON_IMG_SRC = '/assets/img/roulette/00_g-47x30.png';
+
+const GRAPH_WIDTH = 775;
+const GRAPH_HEIGHT = 150;
