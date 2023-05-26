@@ -407,6 +407,7 @@ function updateEquityPerSpot() {
     });
 
     updateChart();
+    updateWheelCovers();
 }
 
 function clearBetInfoUI() {
@@ -418,12 +419,12 @@ function clearBetInfoUI() {
     $('#betInfoBetWinningPayDiv').empty();
 
     if (currentWheelType === WHEEL_TYPE_0) {
-        console.log('clearing hidden classes for 0');
+        //console.log('clearing hidden classes for 0');
         $('#cap-0-0').removeClass('highlight-hidden');
         $('#cap-0-0').addClass('highlight-hidden');
     }
     else {
-        console.log('clearing hidden classes for 00');
+        //console.log('clearing hidden classes for 00');
         $('#cap-00-0').removeClass('highlight-hidden');
         $('#cap-00-00').removeClass('highlight-hidden');
         $('#cap-00-0').addClass('highlight-hidden');
@@ -522,8 +523,6 @@ function onSpotClick(element) {
         wagerKey: element.id,
         amount: CHIP_AMOUNTS[currentSelectedChipIndex]
     });
-
-    //console.log(chipBuffer);
 
     setChipImage(element.id);
     updateBetInfoUI(element.id);
@@ -875,6 +874,7 @@ function createUiElements() {
     createEquityPerSpotDivs();
     createWinLossSpotDivs();
     createSpotHighlightDivs();
+    // TODO: Create wheel covers
 }
 
 function setGraphDimensions() {
@@ -911,7 +911,7 @@ function updateChart() {
     let lossesAndWins = [];
 
     for (let i = 0; i < 38; i++) {
-        if (currentWheelType === WHEEL_TYPE_0 && i === 1) {
+        if (currentWheelType === WHEEL_TYPE_0 && i === 0) {
             continue;
         }
         let value = $('#win-' + ROULETTE_NUMBERS[i]).text();
@@ -981,6 +981,55 @@ function updateChart() {
             }
         }
     });
+}
+
+function updateWheelCovers() {
+    let totalBetAmount = 0;
+    for (const spot in wagers) {
+        totalBetAmount += wagers[spot];
+    }
+    let totalSlots = 37;
+    let totalNonLosingSpots = 0;
+    let wheelCode = '0';
+    if (currentWheelType === WHEEL_TYPE_00) {
+        wheelCode = '00';
+        totalSlots = 38;
+    }
+
+    ROULETTE_NUMBERS.forEach(spot => {
+        if (!equityPerSpot[spot]) {
+            // There's no bet for the spot
+            if (totalBetAmount > 0) {
+                $('#wheel-cover-' + spot + ' img').attr('src', '/assets/img/roulette/wheel/cover-' + wheelCode + '-l-' + spot + '-red-153x153.png');
+            }
+            else {
+                totalNonLosingSpots++;
+                $('#wheel-cover-' + spot + ' img').attr('src', '/assets/img/roulette/wheel/cover-' + wheelCode + '-p-' + spot + '-grey-153x153.png');
+            }
+        }
+        else {
+            let winLossAmount = (equityPerSpot[spot] * 36) - totalBetAmount;
+            if (winLossAmount > 0) {
+                totalNonLosingSpots++;
+                $('#wheel-cover-' + spot + ' img').attr('src', '/assets/img/roulette/wheel/cover-' + wheelCode + '-w-' + spot + '-green-153x153.png');
+            }
+            else if (winLossAmount < 0) {
+                $('#wheel-cover-' + spot + ' img').attr('src', '/assets/img/roulette/wheel/cover-' + wheelCode + '-l-' + spot + '-red-153x153.png');
+            }
+            else {
+                totalNonLosingSpots++;
+                $('#wheel-cover-' + spot + ' img').attr('src', '/assets/img/roulette/wheel/cover-' + wheelCode + '-p-' + spot + '-grey-153x153.png');
+            }
+        }
+    });
+
+    if (totalBetAmount > 0) {
+        $('#coverageLabelDiv').text((100.0 * (totalNonLosingSpots / totalSlots)).toFixed(1) + '%');
+    }
+    else {
+        $('#coverageLabelDiv').text('0%');
+    }
+
 }
 
 $(document).ready(function() {

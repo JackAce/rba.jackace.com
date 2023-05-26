@@ -167,6 +167,13 @@ a:hover {
     top: 535px;
     left: 730px;
 }
+#coverageLabelDiv {
+    position: absolute;
+    z-index: 99;
+    top: 740px;
+    left: 635px;
+    font-size: 12px;
+}
 #wheelToggleImage {
     position: absolute;
     z-index: 15;
@@ -434,7 +441,15 @@ a:hover {
     margin: auto;
     justify-content:center;
 }
-
+.wheel {
+    position: absolute;
+    left: 640px;
+    top: 600px;
+    z-index: 30;
+}
+.wheel-spokes {
+    z-index: 35;
+}
 .hotspot {
     position: absolute;
     opacity: 0.00001;
