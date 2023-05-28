@@ -1,13 +1,14 @@
 // require('roulette-constants.js')
-
 let currentSelectedChipIndex = CHIP_AMOUNT_INDEX_5; // Default to the $5 chip
-let currentWheelType = WHEEL_TYPE_0;                // Single Zero
-let wagers = {};
-let equityPerSpot = {};
-let chipBuffer = [];
+let equityPerSpot = {};     // Does this need to be kept in memory?
+let chipBuffer = [];        // Stores the buffer of chip clicks to allow "undo" operation
+let systemConfig = {
+    wheelType: WHEEL_TYPE_00,
+    wagers: {}
+};
 
 function toggleWheelType() {
-    if (currentWheelType === WHEEL_TYPE_0) {
+    if (systemConfig.wheelType === WHEEL_TYPE_0) {
         setWheelType(WHEEL_TYPE_00);
     }
     else {
@@ -21,6 +22,31 @@ function toggleTextArea() {
     }
     else {
         $('#configurationDiv').addClass('configuration-hidden');
+    }
+}
+
+function parseQueryString() {
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+        get: (searchParams, prop) => searchParams.get(prop),
+    });
+    let qsValue = params.c;
+
+    if (qsValue) {
+        systemConfig = JSON.parse(qsValue);
+        setWheelType(systemConfig.wheelType);
+        systemConfig = JSON.parse(qsValue);
+
+        for (const key in systemConfig.wagers) {
+            addBettingChipWithAmount(key, systemConfig.wagers[key]);
+            setChipImage(key);
+        }
+
+        updateEquityPerSpot();
+        updateTotalAmounts();
+        updateConfiguration();
+    }
+    else {
+        setWheelType(WHEEL_TYPE_00);
     }
 }
 
@@ -45,7 +71,19 @@ function addHotSpot(identifier, isGreen, left, top, className) {
     $('#mainDiv').append(newDiv);
 }
 
-function addBettingChip(elementId, chipIndex) {
+function getBaseChipIndexForAmount(chipAmount) {
+    for (let i = 1; i < CHIP_AMOUNTS.length; i++) {
+        if (chipAmount < CHIP_AMOUNTS[i]) {
+            return i - 1;
+        }
+    }
+
+    console.error('COULD NOT DETERMINE CHIP INDEX');
+    return null;
+}
+
+function addBettingChipWithAmount(elementId, chipAmount) {
+    let chipIndex = getBaseChipIndexForAmount(chipAmount);
     // TODO: Move this to a separate function
     let newDiv = document.createElement('div');
     let newImg = document.createElement('img');
@@ -72,8 +110,11 @@ function addBettingChip(elementId, chipIndex) {
     newTextDiv.innerHTML = CHIP_AMOUNTS[chipIndex];
 
     $('#mainDiv').append(newDiv);
-    $('#' + newDiv.id ).append(newImg);
-    $('#' + newDiv.id ).append(newTextDiv);
+    $('#' + newDiv.id ).append(newImg).append(newTextDiv);
+}
+
+function addBettingChip(elementId, chipIndex) {
+    addBettingChipWithAmount(elementId, CHIP_AMOUNTS[chipIndex]);
 }
 
 function addEquitySpot(spot, left, top) {
@@ -187,7 +228,6 @@ function is00Only(identifier) {
 }
 
 function onSpotHover(element) {
-    //console.log('Hover over [' + element.id + ']');
     $('#betInfoDiv').removeClass('bet-info-hidden');
     updateBetInfoUI(element.id);
 }
@@ -206,16 +246,15 @@ function updateBetInfoUI(elementId) {
     $('#betInfoBetHeaderDiv').text(bet.canonicalName);
     $('#betInfoBetPaysDiv').text('Pays: ' + bet.payout + ':1');
 
-    var currentBet = wagers[elementId];
+    var currentBet = systemConfig.wagers[elementId];
     if (currentBet) {
         $('#betInfoBetCurrentBetDiv').text('Bet: ' + (currentBet).toLocaleString());
         $('#betInfoBetWinningPayDiv').text('Payout: ' + (bet.payout * currentBet).toLocaleString());
     }
 
     bet.numbersCovered.forEach(spot => {
-        //console.log('highlighting ' + spot);
         $('#highlight-' + spot).removeClass('highlight-hidden');
-        if (currentWheelType === WHEEL_TYPE_0) {
+        if (systemConfig.wheelType === WHEEL_TYPE_0) {
             if (spot === '0') {
                 $('#cap-0-0').removeClass('highlight-hidden');
             }
@@ -233,21 +272,21 @@ function updateBetInfoUI(elementId) {
 
 function updateTotalAmounts() {
     let totalBetAmount = 0;
-    for (const key in wagers) {
-        totalBetAmount += wagers[key];
+    for (const key in systemConfig.wagers) {
+        totalBetAmount += systemConfig.wagers[key];
     }
     
     if (totalBetAmount > 0) {
         $('#totalBetAmountDiv').text(totalBetAmount.toLocaleString());
-        if (currentWheelType === WHEEL_TYPE_0) {
+        if (systemConfig.wheelType === WHEEL_TYPE_0) {
             // Single Zero wheel - 2.7%
             $('#evDiv').text((-totalBetAmount / 37.0).toLocaleString());
         }
         else {
             // Double Zero wheel - 5.26%
             // TODO Check for topline bet
-            if (wagers['x5-topline'] > 0) {
-                let topLineBet = wagers['x5-topline'];
+            if (systemConfig.wagers['x5-topline'] > 0) {
+                let topLineBet = systemConfig.wagers['x5-topline'];
                 let totalBetWithoutTopLine = totalBetAmount - topLineBet;
                 let totalEv = -(totalBetWithoutTopLine / 19.0) - (topLineBet * 0.0789);
                 $('#evDiv').text(totalEv.toLocaleString());
@@ -267,7 +306,7 @@ function updateTotalAmounts() {
 
 function setWheelType(wheelType) {
     if (wheelType === WHEEL_TYPE_0) {
-        currentWheelType = WHEEL_TYPE_0;
+        systemConfig.wheelType = WHEEL_TYPE_0;
         $('#wheelToggleImage').attr('src', WHEEL_TYPE_00_BUTTON_IMG_SRC);
         $('#layoutImage').attr('src', WHEEL_TYPE_0_LAYOUT_IMG_SRC);
 
@@ -296,7 +335,7 @@ function setWheelType(wheelType) {
         $('#x3-0-2').css('top', HOTSPOT_INSIDE_ABSOLUTE_TOP + 3 * HOTSPOT_INSIDE_HEIGHT);
     }
     else {
-        currentWheelType = WHEEL_TYPE_00;
+        systemConfig.wheelType = WHEEL_TYPE_00;
         $('#wheelToggleImage').attr('src', WHEEL_TYPE_0_BUTTON_IMG_SRC);
         $('#layoutImage').attr('src', WHEEL_TYPE_00_LAYOUT_IMG_SRC);
 
@@ -342,9 +381,9 @@ function updateEquityPerSpot() {
 
     resetEquityPerSpot();
 
-    for (const spot in wagers) {
-        betInfo = getBetInfo(spot);
-        currentWager = wagers[spot];
+    for (const bet in systemConfig.wagers) {
+        betInfo = getBetInfo(bet);
+        currentWager = systemConfig.wagers[bet];
         currentNumbersCovered = betInfo.numbersCovered.length;
 
         for (let i = 0; i < currentNumbersCovered; i++) {
@@ -360,10 +399,9 @@ function updateEquityPerSpot() {
             else {
                 equityPerSpot[currentNumber] += currentWager / currentNumbersCovered;
             }
-
         }
 
-        $('#chip-' + spot + ' div').text(wagers[spot]);
+        $('#chip-' + bet + ' div').text(systemConfig.wagers[bet]);
     }
 
     for (const spot in equityPerSpot) {
@@ -371,8 +409,8 @@ function updateEquityPerSpot() {
     }
 
     let totalBetAmount = 0;
-    for (const spot in wagers) {
-        totalBetAmount += wagers[spot];
+    for (const bet in systemConfig.wagers) {
+        totalBetAmount += systemConfig.wagers[bet];
     }
 
     $('.win div').removeClass(['amt-pos', 'amt-neg', 'amt-0']);
@@ -391,15 +429,12 @@ function updateEquityPerSpot() {
         else {
             let winLossAmount = (equityPerSpot[spot] * 36) - totalBetAmount;
             if (winLossAmount > 0) {
-                //console.log('SETTING WIN SPOT TO AMT-POS CLASS ' + spot + ' wl ' + winLossAmount);
                 $('#win-' + spot + ' div').addClass('amt-pos');
             }
             else if (winLossAmount < 0) {
-                //console.log('SETTING WIN SPOT TO AMT-NEG CLASS ' + spot + ' wl ' + winLossAmount);
                 $('#win-' + spot + ' div').addClass('amt-neg');
             }
             else {
-                //console.log('SETTING WIN SPOT TO AMT-0 CLASS ' + spot);
                 $('#win-' + spot + ' div').addClass('amt-0');
             }
             $('#win-' + spot + ' div').text(winLossAmount.toLocaleString());
@@ -418,13 +453,11 @@ function clearBetInfoUI() {
     $('#betInfoBetCurrentBetDiv').empty();
     $('#betInfoBetWinningPayDiv').empty();
 
-    if (currentWheelType === WHEEL_TYPE_0) {
-        //console.log('clearing hidden classes for 0');
+    if (systemConfig.wheelType === WHEEL_TYPE_0) {
         $('#cap-0-0').removeClass('highlight-hidden');
         $('#cap-0-0').addClass('highlight-hidden');
     }
     else {
-        //console.log('clearing hidden classes for 00');
         $('#cap-00-0').removeClass('highlight-hidden');
         $('#cap-00-00').removeClass('highlight-hidden');
         $('#cap-00-0').addClass('highlight-hidden');
@@ -447,7 +480,7 @@ function setCurrentChip(chipIndex) {
 }
 
 function clearBets() {
-    wagers = {};
+    systemConfig.wagers = {};
     chipBuffer = [];
     $('.chip-bet').remove();
 
@@ -463,15 +496,15 @@ function undoLastBet() {
     }
 
     let lastBet = chipBuffer.pop();
-    let currentAmount = wagers[lastBet.wagerKey];
+    let currentAmount = systemConfig.wagers[lastBet.wagerKey];
 
     if (lastBet.amount === currentAmount) {
         // Remove chip from DOM
         $('#chip-' + lastBet.wagerKey).remove();
-        delete wagers[lastBet.wagerKey];
+        delete systemConfig.wagers[lastBet.wagerKey];
     }
     else {
-        wagers[lastBet.wagerKey] -= lastBet.amount;
+        systemConfig.wagers[lastBet.wagerKey] -= lastBet.amount;
     }
 
     updateEquityPerSpot();
@@ -480,8 +513,8 @@ function undoLastBet() {
 }
 
 function martingaleBet() {
-    for (const key in wagers) {
-        wagers[key] *= 2;
+    for (const key in systemConfig.wagers) {
+        systemConfig.wagers[key] *= 2;
     }
     chipBuffer = [];
 
@@ -491,10 +524,10 @@ function martingaleBet() {
 }
 
 function halveBet() {
-    for (const key in wagers) {
-        wagers[key] = parseInt(wagers[key] / 2);
-        if (wagers[key] < 1) {
-            wagers[key] = 1;
+    for (const key in systemConfig.wagers) {
+        systemConfig.wagers[key] = parseInt(systemConfig.wagers[key] / 2);
+        if (systemConfig.wagers[key] < 1) {
+            systemConfig.wagers[key] = 1;
         }
     }
     chipBuffer = [];
@@ -507,15 +540,15 @@ function halveBet() {
 function onSpotClick(element) {
     // TODO: DON'T ALLOW BETS OVER $5000
 
-    if (wagers[element.id]) {
+    if (systemConfig.wagers[element.id]) {
         // Update existing chip
-        wagers[element.id] += CHIP_AMOUNTS[currentSelectedChipIndex];
-        $('#chip-' + element.id + ' div').text(wagers[element.id]);
+        systemConfig.wagers[element.id] += CHIP_AMOUNTS[currentSelectedChipIndex];
+        $('#chip-' + element.id + ' div').text(systemConfig.wagers[element.id]);
     }
     else {
         // Add chip to DOM
         addBettingChip(element.id, currentSelectedChipIndex);
-        wagers[element.id] = CHIP_AMOUNTS[currentSelectedChipIndex];
+        systemConfig.wagers[element.id] = CHIP_AMOUNTS[currentSelectedChipIndex];
     }
 
     // Add to chipBuffer;
@@ -540,7 +573,7 @@ function onSpotClick(element) {
 }
 
 function setChipImage(spotId) {
-    let wagerAmount = wagers[spotId];
+    let wagerAmount = systemConfig.wagers[spotId];
     let src = IMG_SRC_CHIP_1000_BLANK;
     if (wagerAmount < 5) {
         src = IMG_SRC_CHIP_1_BLANK;
@@ -558,11 +591,10 @@ function setChipImage(spotId) {
         src = IMG_SRC_CHIP_500_BLANK;
     }
     $('#chip-img-' + spotId ).attr('src', src);
-
 }
 
 function updateConfiguration() {
-    $('#wager-config-textarea').val(JSON.stringify(wagers));
+    $('#wager-config-textarea').val(JSON.stringify(systemConfig));
 }
 
 function getBetInfo(identifier) {
@@ -608,7 +640,6 @@ function getPayout(betType) {
         case 'x18':
             return 1;
     }
-
     return null;
 }
 
@@ -874,7 +905,6 @@ function createUiElements() {
     createEquityPerSpotDivs();
     createWinLossSpotDivs();
     createSpotHighlightDivs();
-    // TODO: Create wheel covers
 }
 
 function setGraphDimensions() {
@@ -911,7 +941,7 @@ function updateChart() {
     let lossesAndWins = [];
 
     for (let i = 0; i < 38; i++) {
-        if (currentWheelType === WHEEL_TYPE_0 && i === 0) {
+        if (systemConfig.wheelType === WHEEL_TYPE_0 && i === 0) {
             continue;
         }
         let value = $('#win-' + ROULETTE_NUMBERS[i]).text();
@@ -985,13 +1015,13 @@ function updateChart() {
 
 function updateWheelCovers() {
     let totalBetAmount = 0;
-    for (const spot in wagers) {
-        totalBetAmount += wagers[spot];
+    for (const spot in systemConfig.wagers) {
+        totalBetAmount += systemConfig.wagers[spot];
     }
     let totalSlots = 37;
     let totalNonLosingSpots = 0;
     let wheelCode = '0';
-    if (currentWheelType === WHEEL_TYPE_00) {
+    if (systemConfig.wheelType === WHEEL_TYPE_00) {
         wheelCode = '00';
         totalSlots = 38;
     }
@@ -1029,9 +1059,9 @@ function updateWheelCovers() {
     else {
         $('#coverageLabelDiv').text('0%');
     }
-
 }
 
 $(document).ready(function() {
     createUiElements();
+    parseQueryString();
 });
