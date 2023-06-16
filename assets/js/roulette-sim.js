@@ -1,4 +1,3 @@
-// require('roulette-constants.js')
 let currentSelectedChipIndex = CHIP_AMOUNT_INDEX_5; // Default to the $5 chip
 let equityPerSpot = {};     // Does this need to be kept in memory?
 let chipBuffer = [];        // Stores the buffer of chip clicks to allow "undo" operation
@@ -446,8 +445,6 @@ function updateEquityPerSpot() {
 }
 
 function clearBetInfoUI() {
-    //$('#betInfoDiv').addClass('bet-info-hidden');
-
     $('#betInfoBetHeaderDiv').empty();
     $('#betInfoBetPaysDiv').empty();
     $('#betInfoBetCurrentBetDiv').empty();
@@ -594,7 +591,23 @@ function setChipImage(spotId) {
 }
 
 function updateConfiguration() {
-    $('#wager-config-textarea').val(JSON.stringify(systemConfig));
+    let totalBetAmount = 0;
+    for (const spot in systemConfig.wagers) {
+        totalBetAmount += systemConfig.wagers[spot];
+    }
+    if (totalBetAmount > 0) {
+        $('#wager-config-textbox').val(JSON.stringify(systemConfig));
+        $('#pattern-link').attr('href', '?c=' + JSON.stringify(systemConfig));
+        if ($('#link-to-system-span').hasClass('link-hidden')) {
+            $('#link-to-system-span').removeClass('link-hidden');
+        }
+    }
+    else {
+        $('#wager-config-textbox').val('');
+        if (!$('#link-to-system-span').hasClass('link-hidden')) {
+            $('#link-to-system-span').addClass('link-hidden');
+        }
+    }
 }
 
 function getBetInfo(identifier) {
@@ -905,6 +918,8 @@ function createUiElements() {
     createEquityPerSpotDivs();
     createWinLossSpotDivs();
     createSpotHighlightDivs();
+    // json textbox should auto-select
+    $("input:text").focus(function() { $(this).select(); } );
 }
 
 function setGraphDimensions() {
@@ -1019,17 +1034,32 @@ function updateWheelCovers() {
         totalBetAmount += systemConfig.wagers[spot];
     }
     let totalSlots = 37;
+    let highestEquityAmt = 0;
+    let totalWinningSpots = 0;
     let totalNonLosingSpots = 0;
+    let totalJackpotSpots = 0;
+    let totalLosingSpots = 0;
+    let totalWhackSpots = 0;
+
     let wheelCode = '0';
     if (systemConfig.wheelType === WHEEL_TYPE_00) {
         wheelCode = '00';
         totalSlots = 38;
     }
+    //highestEquityAmt
+    ROULETTE_NUMBERS.forEach(spot => {
+        let currentEquity = equityPerSpot[spot];
+        if (currentEquity && currentEquity > highestEquityAmt) {
+            highestEquityAmt = currentEquity;
+        }
+    });
 
     ROULETTE_NUMBERS.forEach(spot => {
         if (!equityPerSpot[spot]) {
             // There's no bet for the spot
             if (totalBetAmount > 0) {
+                totalWhackSpots++;
+                totalLosingSpots++;
                 $('#wheel-cover-' + spot + ' img').attr('src', '/assets/img/roulette/wheel/cover-' + wheelCode + '-l-' + spot + '-red-153x153.png');
             }
             else {
@@ -1041,9 +1071,14 @@ function updateWheelCovers() {
             let winLossAmount = (equityPerSpot[spot] * 36) - totalBetAmount;
             if (winLossAmount > 0) {
                 totalNonLosingSpots++;
+                totalWinningSpots++;
+                if (equityPerSpot[spot] == highestEquityAmt) {
+                    totalJackpotSpots++;
+                }
                 $('#wheel-cover-' + spot + ' img').attr('src', '/assets/img/roulette/wheel/cover-' + wheelCode + '-w-' + spot + '-green-153x153.png');
             }
             else if (winLossAmount < 0) {
+                totalLosingSpots++;
                 $('#wheel-cover-' + spot + ' img').attr('src', '/assets/img/roulette/wheel/cover-' + wheelCode + '-l-' + spot + '-red-153x153.png');
             }
             else {
@@ -1054,10 +1089,20 @@ function updateWheelCovers() {
     });
 
     if (totalBetAmount > 0) {
-        $('#coverageLabelDiv').text((100.0 * (totalNonLosingSpots / totalSlots)).toFixed(1) + '%');
+        $('#win-pct-div').text((100.0 * (totalWinningSpots / totalSlots)).toFixed(1) + '%');
+        $('#jackpot-pct-div').text((100.0 * (totalJackpotSpots / totalSlots)).toFixed(1) + '%');
+        $('#whack-pct-div').text((100.0 * (totalWhackSpots / totalSlots)).toFixed(1) + '%');
+        $('#win-cnt-div').text(totalWinningSpots);
+        $('#jackpot-cnt-div').text(totalJackpotSpots);
+        $('#whack-cnt-div').text(totalWhackSpots);
     }
     else {
-        $('#coverageLabelDiv').text('0%');
+        $('#win-pct-div').text('0%');
+        $('#jackpot-pct-div').text('0%');
+        $('#whack-pct-div').text('0%');
+        $('#win-cnt-div').text('--');
+        $('#jackpot-cnt-div').text('--');
+        $('#whack-cnt-div').text('--');
     }
 }
 

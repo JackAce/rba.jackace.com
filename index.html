@@ -110,7 +110,6 @@ title: Roulette Simulator - JackAce.com
           <div class="wheel" id="wheel-cover-36" ><img src="/assets/img/roulette/wheel/cover-00-p-36-grey-153x153.png" width="153" height="153"/></div>
 
           <div class="wheel wheel-spokes" ><img src="/assets/img/roulette/wheel/wheel-spokes-153x153.png" width="153" height="153"/></div>
-          <div id="coverageLabelDiv" >0%</div>
           <div id="hiddenDif" class="preload-images"></div>
 
           <div id="totalsTitleDiv" class="title-bar" >&nbsp;</div>
@@ -135,8 +134,50 @@ title: Roulette Simulator - JackAce.com
           <div id="betInfoBetWinningPayDiv"></div>
         </div>
 
+        <div id="coverage-div">
+          <table>
+            <tr>
+              <th colspan="3">
+                Coverage
+              </th>
+            </tr>
+            <tr>
+              <td class="amt-pos">
+                Win
+              </td>
+              <td class="amt-pos">
+                <div id="win-cnt-div" />
+              <td class="amt-pos">
+                <div id="win-pct-div" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Jackpot
+              </td>
+              <td>
+                <div id="jackpot-cnt-div" />
+              </td>
+              <td>
+                <div id="jackpot-pct-div" />
+              </td>
+            </tr>
+            <tr>
+              <td class="amt-neg">
+                Whack
+              </td>
+              <td class="amt-neg">
+                <div id="whack-cnt-div" />
+              </td>
+              <td class="amt-neg">
+                <div id="whack-pct-div" />
+              </td>
+            </tr>
+          </table>
+        </div>
+
         <div id="configurationDiv" class="configuration-hidden">
-          <textarea id="wager-config-textarea" ></textarea>
+          <input id="wager-config-textbox" type="text" onfocus="" ></input>
         </div>
 
         <div id="linkDiv">
@@ -145,8 +186,10 @@ title: Roulette Simulator - JackAce.com
           <a href="https://www.jackace.com/gambling/roulette/systems/">Roulette Systems</a>
           &nbsp;&nbsp;|&nbsp;&nbsp;
           <a href="https://www.youtube.com/watch?v=qYV3EtumfH8" target="_blank">How do I use this tool?</a>
-          <!-- &nbsp;&nbsp;|&nbsp;&nbsp;
-          <a href="?">Link to this System</a> -->
+          <span id="link-to-system-span" class="link-hidden">
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            <a id="pattern-link" href="?">Link to this betting pattern</a>
+          </span>
         </div>
 
       </div>
