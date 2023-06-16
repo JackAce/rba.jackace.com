@@ -1088,6 +1088,10 @@ function updateWheelCovers() {
         }
     });
 
+    if (systemConfig.wheelType === WHEEL_TYPE_0) {
+        totalWhackSpots--;
+    }
+
     if (totalBetAmount > 0) {
         $('#win-pct-div').text((100.0 * (totalWinningSpots / totalSlots)).toFixed(1) + '%');
         $('#jackpot-pct-div').text((100.0 * (totalJackpotSpots / totalSlots)).toFixed(1) + '%');
