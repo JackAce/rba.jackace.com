@@ -24,6 +24,39 @@ function toggleTextArea() {
     }
 }
 
+function togglePrintable() {
+    if (!$('#betInfoDiv').hasClass('bet-info-hidden')) {
+        $('#hideElementsButton').addClass('button-hidden');
+    }
+
+    if ($('#hideElementsButton').hasClass('button-hidden')) {
+        // Show all elements
+        $('#hideElementsButton').removeClass('button-hidden');
+        $('#showElementsButton').addClass('button-hidden');
+
+        $('#undoButton').removeClass('button-hidden');
+        $('#clearButton').removeClass('button-hidden');
+        $('#doubleButton').removeClass('button-hidden');
+        $('#halveButton').removeClass('button-hidden');
+        $('#bracesButton').removeClass('button-hidden');
+        $('#wheelTypeButton').removeClass('button-hidden');
+        $('#chipSection').removeClass('div-hidden');
+    }
+    else {
+        // Hide non-essential elements to make view "Print-Friendly"
+        $('#hideElementsButton').addClass('button-hidden');
+        $('#showElementsButton').removeClass('button-hidden');
+
+        $('#undoButton').addClass('button-hidden');
+        $('#clearButton').addClass('button-hidden');
+        $('#doubleButton').addClass('button-hidden');
+        $('#halveButton').addClass('button-hidden');
+        $('#bracesButton').addClass('button-hidden');
+        $('#wheelTypeButton').addClass('button-hidden');
+        $('#chipSection').addClass('div-hidden');
+    }
+}
+
 function parseQueryString() {
     const params = new Proxy(new URLSearchParams(window.location.search), {
         get: (searchParams, prop) => searchParams.get(prop),
