@@ -51,22 +51,25 @@ title: Roulette Simulator - JackAce.com
           <div id="halveButton" class="button"><img src="/assets/img/buttons/btn-halve-40x40.png" width="30" height="30" onclick="halveBet();" /></div>
           <!-- <div id="chartButton" class="button"><img src="/assets/img/buttons/btn-chart-34x40.png" width="34" height="40" onclick="toggleTextArea();" /></div> -->
           <div id="bracesButton" class="button"><img src="/assets/img/buttons/btn-braces-40x40.png" width="30" height="30" onclick="toggleTextArea();" /></div>
+          <div id="hideElementsButton" class="button"><img src="/assets/img/buttons/btn-eye-slash-40x40.png" width="30" height="30" onclick="togglePrintable();" /></div>
+          <div id="showElementsButton" class="button button-hidden"><img src="/assets/img/buttons/btn-eye-40x40.png" width="30" height="30" onclick="togglePrintable();" /></div>
 
-          <img src="/assets/img/roulette/00_g-47x30.png" width="47" height="30" id="wheelToggleImage" onclick="toggleWheelType();" />
-
-          <img src="/assets/img/chips/chip_1-50x50.png" width="50" height="50" id="chip-selectable-1" class="chip chip-selectable chip-position-0 chip-1 chip-inactive" />
-          <img src="/assets/img/chips/chip_5-50x50.png" width="50" height="50" id="chip-selectable-5" class="chip chip-selectable chip-position-1 chip-5 chip-inactive" />
-          <img src="/assets/img/chips/chip_25-50x50.png" width="50" height="50" id="chip-selectable-25" class="chip chip-selectable chip-position-2 chip-25 chip-inactive" />
-          <img src="/assets/img/chips/chip_100-50x50.png" width="50" height="50" id="chip-selectable-100" class="chip chip-selectable chip-position-3 chip-100" />
-          <img src="/assets/img/chips/chip_500-50x50.png" width="50" height="50" id="chip-selectable-500" class="chip chip-selectable chip-position-4 chip-500 chip-inactive" />
-          <img src="/assets/img/chips/chip_1000-50x50.png" width="50" height="50" id="chip-selectable-1000" class="chip chip-selectable chip-position-5 chip-1000 chip-inactive" />
-
-          <img src="/assets/img/chips/chip_cover-50x50.png" width="50" height="50" id="chip-cover-0" class="chip chip-cover chip-position-0" onclick="setCurrentChip(0);" />
-          <img src="/assets/img/chips/chip_cover-50x50.png" width="50" height="50" id="chip-cover-1" class="chip chip-cover chip-position-1 chip-cover-hidden" onclick="setCurrentChip(1);" />
-          <img src="/assets/img/chips/chip_cover-50x50.png" width="50" height="50" id="chip-cover-2" class="chip chip-cover chip-position-2" onclick="setCurrentChip(2);" />
-          <img src="/assets/img/chips/chip_cover-50x50.png" width="50" height="50" id="chip-cover-3" class="chip chip-cover chip-position-3" onclick="setCurrentChip(3);" />
-          <img src="/assets/img/chips/chip_cover-50x50.png" width="50" height="50" id="chip-cover-4" class="chip chip-cover chip-position-4" onclick="setCurrentChip(4);" />
-          <img src="/assets/img/chips/chip_cover-50x50.png" width="50" height="50" id="chip-cover-5" class="chip chip-cover chip-position-5" onclick="setCurrentChip(5);" />
+          <div id="wheelTypeButton" class="button"><img src="/assets/img/roulette/00_g-47x30.png" width="47" height="30" id="wheelToggleImage" onclick="toggleWheelType();" /></div>
+          
+          <div id="chipSection">
+            <img src="/assets/img/chips/chip_1-50x50.png" width="50" height="50" id="chip-selectable-1" class="chip chip-selectable chip-position-0 chip-1 chip-inactive" />
+            <img src="/assets/img/chips/chip_5-50x50.png" width="50" height="50" id="chip-selectable-5" class="chip chip-selectable chip-position-1 chip-5 chip-inactive" />
+            <img src="/assets/img/chips/chip_25-50x50.png" width="50" height="50" id="chip-selectable-25" class="chip chip-selectable chip-position-2 chip-25 chip-inactive" />
+            <img src="/assets/img/chips/chip_100-50x50.png" width="50" height="50" id="chip-selectable-100" class="chip chip-selectable chip-position-3 chip-100" />
+            <img src="/assets/img/chips/chip_500-50x50.png" width="50" height="50" id="chip-selectable-500" class="chip chip-selectable chip-position-4 chip-500 chip-inactive" />
+            <img src="/assets/img/chips/chip_1000-50x50.png" width="50" height="50" id="chip-selectable-1000" class="chip chip-selectable chip-position-5 chip-1000 chip-inactive" />
+            <img src="/assets/img/chips/chip_cover-50x50.png" width="50" height="50" id="chip-cover-0" class="chip chip-cover chip-position-0" onclick="setCurrentChip(0);" />
+            <img src="/assets/img/chips/chip_cover-50x50.png" width="50" height="50" id="chip-cover-1" class="chip chip-cover chip-position-1 chip-cover-hidden" onclick="setCurrentChip(1);" />
+            <img src="/assets/img/chips/chip_cover-50x50.png" width="50" height="50" id="chip-cover-2" class="chip chip-cover chip-position-2" onclick="setCurrentChip(2);" />
+            <img src="/assets/img/chips/chip_cover-50x50.png" width="50" height="50" id="chip-cover-3" class="chip chip-cover chip-position-3" onclick="setCurrentChip(3);" />
+            <img src="/assets/img/chips/chip_cover-50x50.png" width="50" height="50" id="chip-cover-4" class="chip chip-cover chip-position-4" onclick="setCurrentChip(4);" />
+            <img src="/assets/img/chips/chip_cover-50x50.png" width="50" height="50" id="chip-cover-5" class="chip chip-cover chip-position-5" onclick="setCurrentChip(5);" />
+          </div>
 
           <div class="wheel" ><img src="/assets/img/roulette/wheel/wheel-base-153x153.png" width="153" height="153"/></div>
 

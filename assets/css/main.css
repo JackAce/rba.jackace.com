@@ -162,6 +162,18 @@ a:hover {
     top: 865px;
     left: 730px;
 }
+#showElementsButton {
+    position: absolute;
+    z-index: 30;
+    top: 915px;
+    left: 730px;
+}
+#hideElementsButton {
+    position: absolute;
+    z-index: 30;
+    top: 915px;
+    left: 730px;
+}
 #jackaceLabelDiv {
     position: absolute;
     z-index: 999;
@@ -225,6 +237,12 @@ a:hover {
     display: none;
 }
 .bet-info-hidden {
+    display: none;
+}
+.button-hidden {
+    display: none;
+}
+.div-hidden {
     display: none;
 }
 .disclaimer {
