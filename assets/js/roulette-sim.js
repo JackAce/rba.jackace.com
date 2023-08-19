@@ -13,6 +13,7 @@ function toggleWheelType() {
     else {
         setWheelType(WHEEL_TYPE_0);
     }
+    clearBetsContainingZero();
 }
 
 function toggleTextArea() {
@@ -312,7 +313,9 @@ function updateTotalAmounts() {
         $('#totalBetAmountDiv').text(totalBetAmount.toLocaleString());
         if (systemConfig.wheelType === WHEEL_TYPE_0) {
             // Single Zero wheel - 2.7%
-            $('#evDiv').text((-totalBetAmount / 37.0).toLocaleString());
+            let totalEv = -(totalBetAmount / 37.0);
+            $('#evDiv').text(totalEv.toLocaleString());
+            $('#compsDiv').text((totalEv / 5.0 ).toLocaleString()); // TODO: Clean this up
         }
         else {
             // Double Zero wheel - 5.26%
@@ -322,12 +325,14 @@ function updateTotalAmounts() {
                 let totalBetWithoutTopLine = totalBetAmount - topLineBet;
                 let totalEv = -(totalBetWithoutTopLine / 19.0) - (topLineBet * 0.0789);
                 $('#evDiv').text(totalEv.toLocaleString());
+                $('#compsDiv').text((totalEv / 5.0 ).toLocaleString()); // TODO: Clean this up
             }
             else {
-                $('#evDiv').text((-totalBetAmount / 19.0).toLocaleString());
+                let totalEv = -(totalBetAmount / 19.0);
+                $('#evDiv').text(totalEv.toLocaleString());
+                $('#compsDiv').text((totalEv / 5.0 ).toLocaleString()); // TODO: Clean this up
             }
         }
-        $('#compsDiv').text((totalBetAmount / 185.0 ).toLocaleString());
     }
     else {
         $('#totalBetAmountDiv').text('0');
@@ -397,7 +402,9 @@ function setWheelType(wheelType) {
         $('#x3-0-3').css('top', HOTSPOT_INSIDE_ABSOLUTE_TOP + 1.125 * HOTSPOT_INSIDE_HEIGHT);
         $('#x3-0-2').css('top', HOTSPOT_INSIDE_ABSOLUTE_TOP + 3.25 * HOTSPOT_INSIDE_HEIGHT);
     }
-    clearBets();
+
+    // TODO: WE DON'T WANT TO CLEAR
+    // clearBets();
 }
 
 function resetEquityPerSpot() {
@@ -425,8 +432,9 @@ function updateEquityPerSpot() {
             }
 
             if (currentNumbersCovered === 5) {
-                // TODO: Handle the x5 top line bet
-                equityPerSpot[currentNumber] += currentWager / currentNumbersCovered;
+                // TODO: Handle the x5 top line bet WARNING: MAGIC NUMBER
+                equityPerSpot[currentNumber] += currentWager * (6.02777777777777777777777777777778/31.0);
+
             }
             else {
                 equityPerSpot[currentNumber] += currentWager / currentNumbersCovered;
@@ -519,6 +527,24 @@ function clearBets() {
     updateConfiguration();
 }
 
+function clearBetsContainingZero() {
+    // Delete bets that can't be made
+    for (var property in systemConfig.wagers) {
+        // We delete the HOTSPOTS_0_00_OVERLAP spots because they may need to shift positions
+        if (HOTSPOTS_0_ONLY.includes(property) || HOTSPOTS_00_ONLY.includes(property) || HOTSPOTS_0_00_OVERLAP.includes(property) || property === 'x1-0') {
+            delete systemConfig.wagers[property];
+            $('#chip-' + property).remove();
+        }
+    }
+
+    // TODO: ONLY remove the removed chips from the chip buffer
+    chipBuffer = [];
+
+    updateEquityPerSpot();
+    updateTotalAmounts();
+    updateConfiguration();
+}
+
 function undoLastBet() {
     if (chipBuffer.length === 0) {
         // Nothing to do
@@ -542,20 +568,9 @@ function undoLastBet() {
     updateConfiguration();
 }
 
-function martingaleBet() {
+function multiplyBet(multiplier) {
     for (const key in systemConfig.wagers) {
-        systemConfig.wagers[key] *= 2;
-    }
-    chipBuffer = [];
-
-    updateEquityPerSpot();
-    updateTotalAmounts();
-    updateConfiguration();
-}
-
-function halveBet() {
-    for (const key in systemConfig.wagers) {
-        systemConfig.wagers[key] = parseInt(systemConfig.wagers[key] / 2);
+        systemConfig.wagers[key] = parseInt(systemConfig.wagers[key] * multiplier);
         if (systemConfig.wagers[key] < 1) {
             systemConfig.wagers[key] = 1;
         }
@@ -565,6 +580,14 @@ function halveBet() {
     updateEquityPerSpot();
     updateTotalAmounts();
     updateConfiguration();
+}
+
+function martingaleBet() {
+    multiplyBet(2.0);
+}
+
+function halveBet() {
+    multiplyBet(0.5);
 }
 
 function onSpotClick(element) {
@@ -592,6 +615,15 @@ function onSpotClick(element) {
     updateTotalAmounts();
     updateEquityPerSpot();
     updateConfiguration();
+
+    if (element.id === 'x5-topline') {
+        // Check for top line bet
+        showModal('#modal-copy-top-line-bet');
+    }
+    else if (Object.keys(equityPerSpot).length > 35) {
+        // Check for 36 numbers
+        showModal('#modal-copy-36-numbers');
+    }
 
     // Deselect anything that is highlighted
     if (window.getSelection) {
@@ -712,11 +744,20 @@ function getNumbersCovered(betType, identifierPart1, identifierPart2) {
 
     // Don't add 1 to identifierPart1 because of 'x3-0-3' - You have to subtract 1 from identifierPart2
     if (betType === 'x3' ) {
-        return [identifierPart1, (identifierPart2Value - 1).toString(), identifierPart2];
+        return [
+            identifierPart1,
+            (identifierPart2Value - 1).toString(),
+            identifierPart2
+        ];
     }
 
     if (betType === 'x4' ) {
-        return [identifierPart1, (identifierPart1Value + 1).toString(), (identifierPart2Value - 1).toString(), identifierPart2];
+        return [
+            identifierPart1,
+            (identifierPart1Value + 1).toString(),
+            (identifierPart2Value - 1).toString(),
+            identifierPart2
+        ];
     }
 
     if (betType === 'x6' ) {
@@ -726,7 +767,8 @@ function getNumbersCovered(betType, identifierPart1, identifierPart2) {
             (identifierPart1Value + 2).toString(),
             (identifierPart1Value + 3).toString(),
             (identifierPart1Value + 4).toString(),
-            identifierPart2];
+            identifierPart2
+        ];
     }
 
     if (betType === 'x12') {
@@ -1141,6 +1183,21 @@ function updateWheelCovers() {
         $('#jackpot-cnt-div').text('--');
         $('#whack-cnt-div').text('--');
     }
+}
+
+function closeModal() {
+    $('#modal-overlay').addClass('div-hidden');
+}
+
+function showModal(copyElement) {
+    $('.modal-copy').removeClass('div-hidden');
+    $('.modal-copy').addClass('div-hidden');
+    $(copyElement).removeClass('div-hidden');
+    $('#modal-overlay').removeClass('div-hidden');
+}
+
+function closeModal() {
+    $('#modal-overlay').addClass('div-hidden');
 }
 
 $(document).ready(function() {
