@@ -315,7 +315,7 @@ function updateTotalAmounts() {
             // Single Zero wheel - 2.7%
             let totalEv = -(totalBetAmount / 37.0);
             $('#evDiv').text(totalEv.toLocaleString());
-            $('#compsDiv').text((totalEv / 5.0 ).toLocaleString()); // TODO: Clean this up
+            $('#compsDiv').text((totalEv / -5.0 ).toLocaleString()); // TODO: Clean this up
         }
         else {
             // Double Zero wheel - 5.26%
@@ -325,12 +325,12 @@ function updateTotalAmounts() {
                 let totalBetWithoutTopLine = totalBetAmount - topLineBet;
                 let totalEv = -(totalBetWithoutTopLine / 19.0) - (topLineBet * 0.0789);
                 $('#evDiv').text(totalEv.toLocaleString());
-                $('#compsDiv').text((totalEv / 5.0 ).toLocaleString()); // TODO: Clean this up
+                $('#compsDiv').text((totalEv / -5.0 ).toLocaleString()); // TODO: Clean this up
             }
             else {
                 let totalEv = -(totalBetAmount / 19.0);
                 $('#evDiv').text(totalEv.toLocaleString());
-                $('#compsDiv').text((totalEv / 5.0 ).toLocaleString()); // TODO: Clean this up
+                $('#compsDiv').text((totalEv / -5.0 ).toLocaleString()); // TODO: Clean this up
             }
         }
     }
