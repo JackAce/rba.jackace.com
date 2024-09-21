@@ -23,10 +23,19 @@ email: jackace@jackace.com
 description: >- # this means to ignore newlines until "baseurl:"
   Roulette Simulator by JackAce
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://roulette-sim.jackace.com"
+url: "https://rba.jackace.com"
 twitter_username: jackace
 github_username:  jackace
 google_analytics: G-D6BLYMY10E
 google_adsense: ca-pub-5831288475713424
 
 port: 4037
+
+plugins:
+  - jekyll-seo-tag
+  - jekyll-github-metadata
+  - jekyll-redirect-from
+  - jekyll-include-cache
+  #- jekyll-feed
+  #- jekyll-sitemap
+  #- jekyll-paginate
