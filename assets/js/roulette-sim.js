@@ -857,7 +857,7 @@ function getCanonicalName(betType, identifierPart1, identifierPart2) {
         if (identifierPart1 === 'col3') {
             return '3rd Column';
         }
-        if (identifierPart1 === 'doz2') {
+        if (identifierPart1 === 'col2') {
             return '2nd Column';
         }
         return '1st Column';
