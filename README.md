@@ -1,3 +1,3 @@
-# roulette-sim.jackace.com
+# rba.jackace.com
 
-Roulette Strategy Simulator
+Roulette Bet Analyzer
