@@ -8,12 +8,24 @@ let systemConfig = {
 
 function toggleWheelType() {
     if (systemConfig.wheelType === WHEEL_TYPE_0) {
+        $('#cap-0-0').removeClass('highlight-hidden');
+        $('#cap-0-0').addClass('highlight-hidden');
+    }
+    else {
+        $('#cap-00-0').removeClass('highlight-hidden');
+        $('#cap-00-00').removeClass('highlight-hidden');
+        $('#cap-00-0').addClass('highlight-hidden');
+        $('#cap-00-00').addClass('highlight-hidden');
+    }
+
+    if (systemConfig.wheelType === WHEEL_TYPE_0) {
         setWheelType(WHEEL_TYPE_00);
     }
     else {
         setWheelType(WHEEL_TYPE_0);
     }
     clearBetsContainingZero();
+    clearBetInfoUI();
 }
 
 function toggleTextArea() {
@@ -504,8 +516,23 @@ function clearBetInfoUI() {
 
     ROULETTE_NUMBERS.forEach(spot => {
         $('#highlight-' + spot).removeClass('highlight-hidden');
-        $('#highlight-' + spot).addClass('highlight-hidden');
+        if (!equityPerSpot[spot]) {
+            $('#highlight-' + spot).addClass('highlight-hidden');
+        }
     });
+
+    if (equityPerSpot['0']) {
+        if (systemConfig.wheelType === WHEEL_TYPE_0) {
+            $('#cap-0-0').removeClass('highlight-hidden');
+        }
+        else if (systemConfig.wheelType === WHEEL_TYPE_00) {
+            $('#cap-00-0').removeClass('highlight-hidden');
+        }
+    }
+
+    if (equityPerSpot['00']) {
+        $('#cap-00-00').removeClass('highlight-hidden');
+    }
 }
 
 function setCurrentChip(chipIndex) {
@@ -525,6 +552,7 @@ function clearBets() {
     updateEquityPerSpot();
     updateTotalAmounts();
     updateConfiguration();
+    clearBetInfoUI();
 }
 
 function clearBetsContainingZero() {
@@ -566,6 +594,7 @@ function undoLastBet() {
     updateEquityPerSpot();
     updateTotalAmounts();
     updateConfiguration();
+    clearBetInfoUI();
 }
 
 function multiplyBet(multiplier) {
