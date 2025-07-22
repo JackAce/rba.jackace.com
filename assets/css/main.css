@@ -353,10 +353,10 @@ a:hover {
 }
 .chip-selectable {
     position: absolute;
-    z-index: 20;
+    z-index: 70;
 }
 .chip {
-    z-index: 20;
+    z-index: 70;
     width: 30px;
     height: 30px;
     overflow: hidden;
@@ -375,7 +375,7 @@ a:hover {
 }
 .chip-text {
     position: relative;
-    z-index: 30;
+    z-index: 75;
     width: 30px;
     height: 30px;
     top: -23px;
@@ -392,10 +392,10 @@ a:hover {
 
 .highlight {
     position: absolute;
-    z-index: 99;
+    z-index: 60;
     width: 52px;
     height: 76px;
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.45);
 }
 .highlight-0-0 {
     width: 40px;
@@ -411,34 +411,34 @@ a:hover {
 }
 .highlight-0-0-cap {
     position: absolute;
-    z-index: 88;
+    z-index: 60;
     width: 0;
     height: 0;
     top: 56px;
     left: 31px;
-    border-right: 21px solid rgba(255, 255, 255, 0.3);
+    border-right: 21px solid rgba(255, 255, 255, 0.45);
     border-top: 115px solid transparent;
     border-bottom: 115px solid transparent;
 }
 .highlight-00-0-cap {
     position: absolute;
-    z-index: 88;
+    z-index: 60;
     width: 0;
     height: 0;
     top: 173px;
     left: 31px;
-    border-right: 21px solid rgba(255, 255, 255, 0.3);
+    border-right: 21px solid rgba(255, 255, 255, 0.45);
     border-top: 57.5px solid transparent;
     border-bottom: 57.5px solid transparent;
 }
 .highlight-00-00-cap {
     position: absolute;
-    z-index: 88;
+    z-index: 60;
     width: 0;
     height: 0;
     top: 58px;
     left: 31px;
-    border-right: 21px solid rgba(255, 255, 255, 0.3);
+    border-right: 21px solid rgba(255, 255, 255, 0.45);
     border-top: 57.5px solid transparent;
     border-bottom: 57.5px solid transparent;
 }
